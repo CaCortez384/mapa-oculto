@@ -101,8 +101,10 @@ function App() {
 
   const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
   // --- EFECTOS ---
-  useEffect(() => {
+  useEffect(() => { 
     fetchStories();
   }, []);
 
@@ -126,10 +128,10 @@ function App() {
   // Ahora la función acepta una categoría opcional
   const fetchStories = async (category?: string | null) => {
     try {
-      // Si hay categoría, la agregamos a la URL. Si no, URL limpia.
+      // Usamos la variable dinámica en lugar del texto fijo
       const url = category
-        ? `http://localhost:3000/api/stories?category=${category}`
-        : "http://localhost:3000/api/stories";
+        ? `${API_URL}/stories?category=${category}`
+        : `${API_URL}/stories`;
 
       const response = await axios.get(url);
       setStories(response.data);
@@ -193,7 +195,7 @@ function App() {
         longitude: newStoryLocation.longitude,
       };
 
-      await axios.post("http://localhost:3000/api/stories", payload);
+      await axios.post(`${API_URL}/stories`, payload);
       await fetchStories(); // Recargar mapa
 
       setNewStoryLocation(null); // Cerrar formulario
@@ -255,8 +257,8 @@ function App() {
       // 3. LLAMADA AL BACKEND
       // Elegimos la ruta según la acción
       const endpoint = isLiked
-        ? `http://localhost:3000/api/stories/${storyId}/unlike`
-        : `http://localhost:3000/api/stories/${storyId}/like`;
+        ? `${API_URL}/stories/${storyId}/unlike`
+        : `${API_URL}/stories/${storyId}/like`;
 
       await axios.patch(endpoint);
     } catch (error) {
