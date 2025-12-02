@@ -21,10 +21,10 @@ app.use(express.json()); // OBLIGATORIO: Esto convierte el JSON entrante a objet
 
 // --- 3. DEFINIR EL ESCUDO ANTI-SPAM ---
 const createStoryLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 60 * 1000, // 1 minuto
   max: 3, // Límite de 3 historias por IP en ese tiempo
   message: {
-    error: "⛔ Calma, vaquero. Has publicado mucho. Espera 15 min.",
+    error: "⛔ Calma, vaquero. Has publicado mucho. Espera 1 minuto.",
   },
   standardHeaders: true, // Devuelve info de límites en las cabeceras
   legacyHeaders: false,
