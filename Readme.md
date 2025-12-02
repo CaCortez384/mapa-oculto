@@ -29,7 +29,7 @@ Mapa Oculto permite publicar y descubrir historias en ubicaciones específicas. 
 
 ## 🛠️ Tecnologías
 
-- Frontend: React + Vite, TypeScript
+- Frontend: React + Vite y TypeScript
 - Mapas: Mapbox GL JS
 - Backend: Node.js (TypeScript), Express
 - ORM: Prisma
