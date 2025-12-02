@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mapa-oculto.vercel.app/sitemap.xml
