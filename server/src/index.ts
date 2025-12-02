@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { PrismaClient } from "@prisma/client";
+import rateLimit from "express-rate-limit"; // <--- 1. NUEVO IMPORT
 
 dotenv.config();
 
@@ -9,9 +10,25 @@ const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- 2. CONFIGURACIÓN CRÍTICA PARA RENDER ---
+// Esto permite leer la IP real del usuario a través del proxy de Render
+// Si no pones esto, el limitador bloqueará a todos los usuarios a la vez.
+app.set('trust proxy', 1);
+
 // --- MIDDLEWARES (El orden importa) ---
 app.use(cors());
 app.use(express.json()); // OBLIGATORIO: Esto convierte el JSON entrante a objetos JS
+
+// --- 3. DEFINIR EL ESCUDO ANTI-SPAM ---
+const createStoryLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 3, // Límite de 3 historias por IP en ese tiempo
+  message: {
+    error: "⛔ Calma, vaquero. Has publicado mucho. Espera 15 min.",
+  },
+  standardHeaders: true, // Devuelve info de límites en las cabeceras
+  legacyHeaders: false,
+});
 
 // Ruta de prueba
 app.get("/api/health", (req, res) => {
@@ -19,7 +36,8 @@ app.get("/api/health", (req, res) => {
 });
 
 // Ruta para crear historias
-app.post("/api/stories", async (req, res) => {
+// --- 4. APLICAMOS EL LIMITADOR AQUÍ (createStoryLimiter) ---
+app.post("/api/stories", createStoryLimiter, async (req, res) => {
   console.log("📥 Petición recibida en POST /stories");
 
   // 1. Verificamos si el body llegó
@@ -48,16 +66,17 @@ app.post("/api/stories", async (req, res) => {
     // 3. Inserción con SQL Puro (La forma correcta para PostGIS)
     // Nota: El array devuelve [story], por eso desestructuramos el primer resultado
     const result = await prisma.$queryRaw`
-      INSERT INTO "Story" (content, category, latitude, longitude, "createdAt", location)
+      INSERT INTO "Story" (content, category, latitude, longitude, "createdAt", location, likes)
       VALUES (
         ${content}, 
         ${category}, 
         ${latitude}, 
         ${longitude}, 
         NOW(), 
-        ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)
+        ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326),
+        0
       )
-      RETURNING id, content, category, latitude, longitude;
+      RETURNING id, content, category, latitude, longitude, likes;
     `;
 
     console.log("✅ Historia guardada!");
@@ -86,10 +105,7 @@ app.get("/api/stories", async (req, res) => {
         latitude: true,
         longitude: true,
         createdAt: true,
-
-        // --- AGREGAR ESTA LÍNEA ---
         likes: true,
-        // --------------------------
       },
       orderBy: {
         createdAt: "desc",
@@ -103,7 +119,6 @@ app.get("/api/stories", async (req, res) => {
     res.status(500).json({ error: "Error al cargar historias" });
   }
 });
-// --- PEGAR ESTO ANTES DE app.listen ---
 
 // PATCH: Dar Like a una historia
 app.patch("/api/stories/:id/like", async (req, res) => {
@@ -134,9 +149,6 @@ app.patch('/api/stories/:id/unlike', async (req, res) => {
     const { id } = req.params;
 
     // Usamos decrement, pero solo si es mayor a 0 (para evitar negativos)
-    // Prisma no tiene "decrement if positive" nativo simple, así que confiamos 
-    // en que el frontend no permita llamar a esto si ya es 0, o usamos updateMany con where.
-    
     const updatedStory = await prisma.story.update({
       where: { id: Number(id) },
       data: {

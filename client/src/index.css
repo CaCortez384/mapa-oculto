@@ -7,11 +7,72 @@ body {
   padding: 0;
   width: 100vw;
   height: 100vh;
-  overflow: hidden; /* Evita barras de scroll */
+  overflow: hidden;
   background-color: #000;
 }
 
-#root {
-  width: 100%;
-  height: 100%;
+/* --- CLASES NUEVAS RESPONSIVAS --- */
+
+/* 1. Contenedor de Filtros */
+.filter-bar {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  
+  /* MOBILE POR DEFECTO: Abajo y con scroll si no caben */
+  bottom: 30px; 
+  top: auto;
+  max-width: 90%;
+  overflow-x: auto; /* Scroll horizontal si tienes muchas categorías */
+  white-space: nowrap;
+  
+  /* Ocultar barra de scroll fea */
+  scrollbar-width: none; 
+}
+
+.filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 2. Título de la App */
+.app-title-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+}
+
+.app-title-text {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+  
+  /* MOBILE: Texto más pequeño */
+  font-size: 1.5rem; 
+}
+
+/* --- MEDIA QUERY (PANTALLAS GRANDES / PC) --- */
+@media (min-width: 768px) {
+  
+  /* En PC, subimos los filtros arriba */
+  .filter-bar {
+    top: 20px;
+    bottom: auto;
+  }
+
+  /* En PC, el título es gigante */
+  .app-title-text {
+    font-size: 2rem;
+  }
 }
