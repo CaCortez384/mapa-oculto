@@ -12,6 +12,7 @@ import { MapPin, Plus, X, Heart, Ghost, Skull, Eye } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { WelcomeModal } from "./WelcomeModal";
 
 // --- TIPOS DE DATOS ---
 interface Story {
@@ -34,6 +35,8 @@ function App() {
   const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
   // Usamos la variable de entorno o localhost por defecto
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
+  const [showWelcome, setShowWelcome] = useState(false); // <--- ESTADO NUEVO
 
   // --- 2. ESTADOS ---
 
@@ -221,6 +224,19 @@ function App() {
 
   // --- 5. EFECTOS (Side Effects) ---
 
+  // EFECTO: Revisar si es la primera visita
+  useEffect(() => {
+    const hasSeenWelcome = localStorage.getItem("hasSeenWelcome_v1");
+    if (!hasSeenWelcome) {
+      setShowWelcome(true);
+    }
+  }, []);
+
+  const handleCloseWelcome = () => {
+    localStorage.setItem("hasSeenWelcome_v1", "true");
+    setShowWelcome(false);
+  };
+
   // Carga inicial de datos (SOLO UNA VEZ)
   useEffect(() => {
     fetchStories();
@@ -257,14 +273,8 @@ function App() {
 
   // --- 6. RENDERIZADO ---
   return (
-    <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        position: "relative",
-        backgroundColor: "#000",
-      }}
-    >
+    <div className="app-container">
+      {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
       <Toaster theme="dark" position="bottom-center" />
 
       {/* --- BARRA DE FILTROS --- */}
