@@ -13,6 +13,7 @@ import { Toaster, toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { WelcomeModal } from "./WelcomeModal";
+import { io } from "socket.io-client";
 
 // --- TIPOS DE DATOS ---
 interface Story {
@@ -240,6 +241,28 @@ function App() {
   // Carga inicial de datos (SOLO UNA VEZ)
   useEffect(() => {
     fetchStories();
+  }, []);
+
+  // --- EFECTO: CONEXIÓN REAL-TIME (WEBSOCKETS) ---
+  useEffect(() => {
+    // 1. Conectar al servidor
+    const socket = io(API_URL.replace("/api", "")); // Quitamos /api porque Socket.io conecta a la raíz
+
+    // 2. Escuchar cuando alguien crea una historia
+    socket.on("new-story", (newStory: Story) => {
+      // 3. Agregarla a la lista sin recargar
+      // Usamos el callback del setStories para asegurar tener el estado previo más fresco
+      setStories((prevStories) => [newStory, ...prevStories]);
+
+      toast.success("¡Alguien acaba de publicar una historia nueva!", {
+        icon: "📡",
+      });
+    });
+
+    // 4. Limpieza al salir (Evita conexiones duplicadas)
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   // Guardar likes en LocalStorage cuando cambien
