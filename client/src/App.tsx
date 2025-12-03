@@ -8,7 +8,16 @@ import Map, {
 import type { MapLayerMouseEvent } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import axios from "axios";
-import { MapPin, Plus, X, Heart, Ghost, Skull, Eye } from "lucide-react";
+import {
+  MapPin,
+  Plus,
+  X,
+  Heart,
+  Ghost,
+  Skull,
+  Eye,
+  Share2,
+} from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -294,6 +303,42 @@ function App() {
     }
   }, []);
 
+  // EFECTO: DEEP LINKING (Revisar si vengo de un link compartido)
+  useEffect(() => {
+    // Leemos los parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
+    const storyId = params.get("story");
+
+    if (storyId) {
+      // Si hay ID, preguntamos al backend por esa historia específica
+      axios
+        .get(`${API_URL}/stories/${storyId}`)
+        .then((response) => {
+          const story = response.data;
+          if (story) {
+            // 1. Volar al lugar (Animación suave)
+            setViewState((prev) => ({
+              ...prev,
+              latitude: story.latitude,
+              longitude: story.longitude,
+              zoom: 16, // Zoom cercano para enfocar
+              transitionDuration: 2000, // 2 segundos de vuelo
+            }));
+
+            // 2. Abrir el popup automáticamente
+            setSelectedCluster([story]);
+
+            toast.success("¡Encontramos la historia compartida!", {
+              icon: "🔗",
+            });
+          }
+        })
+        .catch(() => {
+          toast.error("La historia compartida ya no existe.");
+        });
+    }
+  }, []); // Array vacío = Solo se ejecuta al abrir la página
+
   // --- 6. RENDERIZADO ---
   return (
     <div className="app-container">
@@ -515,6 +560,31 @@ function App() {
                         justifyContent: "flex-end",
                       }}
                     >
+                      {/* BOTÓN COMPARTIR (NUEVO) */}
+                      <button
+                        onClick={() => {
+                          const link = `${window.location.origin}/?story=${story.id}`;
+                          navigator.clipboard.writeText(link);
+                          toast.success("Link copiado al portapapeles!");
+                        }}
+                        style={{
+                          background: "transparent",
+                          border: "none",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                          color: "#666",
+                          fontSize: "0.8rem",
+                          padding: "4px 8px",
+                          borderRadius: "12px",
+                          transition: "all 0.2s",
+                        }}
+                        className="hover:bg-gray-100"
+                        title="Copiar enlace directo"
+                      >
+                        <Share2 size={16} />
+                      </button>
                       <button
                         onClick={() => handleLike(story.id)}
                         style={{

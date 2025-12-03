@@ -99,6 +99,38 @@ app.get("/api/stories", async (req, res) => {
     } catch (e) { res.status(500).json({error: "Error"}); }
 });
 
+// --- AGREGAR EN server/src/index.ts ---
+
+// GET: Obtener una historia específica por ID (Para Deep Linking)
+app.get("/api/stories/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const story = await prisma.story.findUnique({
+      where: { id: Number(id) },
+      // Importante: No olvides seleccionar 'likes' para que el frontend no se rompa
+      select: {
+        id: true,
+        content: true,
+        category: true,
+        latitude: true,
+        longitude: true,
+        createdAt: true,
+        likes: true,
+      }
+    });
+
+    if (!story) {
+      res.status(404).json({ error: "Historia no encontrada" });
+      return; 
+    }
+
+    res.json(story);
+  } catch (error) {
+    console.error("Error buscando historia:", error);
+    res.status(500).json({ error: "Error interno" });
+  }
+});
+
 app.patch("/api/stories/:id/like", async (req, res) => {
     // ... TU CÓDIGO LIKE EXISTENTE ...
     // (Pégalo aquí)
