@@ -1,46 +1,50 @@
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --color-accent: #ff0055;
+  --color-surface: #1a1a1a;
+  --color-surface-alt: #222;
+  --color-border: #333;
+  --color-border-light: #444;
+  --color-text: white;
+  --color-text-muted: #888;
+  --color-text-dim: #666;
+  --color-text-faint: #999;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 15px;
+  --radius-xl: 20px;
 }
 
 html, body {
   margin: 0;
   padding: 0;
-  /* CAMBIO CLAVE: Usamos 100% en lugar de 100vw para evitar scroll horizontal fantasma */
   width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: #000;
 }
 
-/* --- CONTENEDOR PRINCIPAL RESPONSIVO --- */
+/* --- MAIN CONTAINER --- */
 .app-container {
   position: relative;
   background-color: #000;
   overflow: hidden;
-
-  /* ESTRATEGIA: Ocupar todo el espacio disponible del padre (body) */
   width: 100%;
   height: 100%;
-  
-  /* Soporte para altura dinámica en móviles (barras de navegador que se esconden) */
-  height: 100dvh; 
+  height: 100dvh;
 }
 
-/* --- MODAL DE BIENVENIDA (CORREGIDO) --- */
+/* --- WELCOME MODAL --- */
 .modal-overlay {
   position: fixed;
-  /* CAMBIO CLAVE: En lugar de width: 100vw, anclamos a las 4 esquinas.
-     Esto obliga al div a llenar la pantalla respetando los bordes reales. */
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
-  
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,28 +53,20 @@ html, body {
 
 .modal-content {
   background: #111;
-  border: 1px solid #333;
+  border: 1px solid var(--color-border);
   border-radius: 24px;
   padding: 24px;
   width: 100%;
   max-width: 400px;
-  
-  /* Altura segura */
   max-height: 85vh;
   overflow-y: auto;
-  
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  
-  /* Scrollbar oculta */
   scrollbar-width: none;
 }
 
-.modal-content::-webkit-scrollbar {
-  display: none;
-}
+.modal-content::-webkit-scrollbar { display: none; }
 
-/* Título Responsivo */
 .modal-title {
   margin-top: 0;
   margin-bottom: 12px;
@@ -82,7 +78,7 @@ html, body {
 }
 
 .text-highlight {
-  color: #ff0055;
+  color: var(--color-accent);
   white-space: nowrap;
 }
 
@@ -94,7 +90,6 @@ html, body {
   text-align: center;
 }
 
-/* Pasos */
 .modal-step {
   display: flex;
   align-items: flex-start;
@@ -106,11 +101,11 @@ html, body {
 }
 
 .modal-icon-box {
-  background: #222;
+  background: var(--color-surface-alt);
   min-width: 36px;
   height: 36px;
   border-radius: 10px;
-  color: #ff0055;
+  color: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -127,15 +122,14 @@ html, body {
 .step-desc {
   margin: 0;
   font-size: 0.85rem;
-  color: #888;
+  color: var(--color-text-muted);
   line-height: 1.3;
 }
 
-/* Botón Principal */
 .modal-button {
   width: 100%;
   padding: 14px;
-  background: #ff0055;
+  background: var(--color-accent);
   color: white;
   border: none;
   border-radius: 14px;
@@ -159,15 +153,12 @@ html, body {
   margin-bottom: 0;
 }
 
-/* Animación */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px) scale(0.95); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* --- CLASES NUEVAS RESPONSIVAS (FILTROS Y TÍTULO) --- */
-
-/* 1. Contenedor de Filtros */
+/* --- FILTER BAR --- */
 .filter-bar {
   position: absolute;
   left: 50%;
@@ -177,23 +168,292 @@ html, body {
   gap: 8px;
   background: rgba(0, 0, 0, 0.7);
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   backdrop-filter: blur(4px);
-  
-  /* MOBILE POR DEFECTO */
-  bottom: 30px; 
+  bottom: 30px;
   top: auto;
   max-width: 90%;
   overflow-x: auto;
   white-space: nowrap;
-  scrollbar-width: none; 
+  scrollbar-width: none;
 }
 
-.filter-bar::-webkit-scrollbar {
-  display: none;
+.filter-bar::-webkit-scrollbar { display: none; }
+
+.filter-btn {
+  background: transparent;
+  color: white;
+  border: 1px solid #555;
+  padding: 6px 12px;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
-/* 2. Título de la App */
+.filter-btn:hover {
+  border-color: #777;
+}
+
+.filter-btn--active {
+  background: var(--filter-color, var(--color-accent));
+  border-color: var(--filter-color, var(--color-accent));
+}
+
+.filter-btn--clear {
+  background: var(--color-border);
+  color: #ccc;
+  border-color: var(--color-border-light);
+}
+
+.filter-dot { margin-right: 2px; }
+
+/* --- STORY MARKER --- */
+.story-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.story-marker:hover {
+  transform: scale(1.1);
+}
+
+/* --- STORY POPUP --- */
+.popup-container {
+  padding: 0;
+  color: #1a1a1a;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.popup-header {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-header__title {
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.popup-header__close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-text-faint);
+  padding: 4px;
+}
+
+.popup-list { padding: 0 15px 15px 15px; }
+
+.popup-story { margin-top: 15px; }
+
+.popup-story--bordered {
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 15px;
+}
+
+.popup-story__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.popup-story__category {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.popup-story__time {
+  font-size: 0.7rem;
+  color: var(--color-text-faint);
+  margin-left: auto;
+  font-style: italic;
+}
+
+.popup-story__content {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.popup-story__actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.popup-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text-dim);
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  transition: all 0.2s;
+}
+
+.popup-action-btn:hover { background: #f3f4f6; }
+
+.popup-action-btn--liked { color: #e11d48; }
+
+.popup-action-btn__count { font-weight: bold; }
+
+.popup-icon--amor { color: #ec4899; }
+.popup-icon--miedo { color: #a855f7; }
+.popup-icon--crimen { color: #ef4444; }
+.popup-icon--curiosidad { color: #3b82f6; }
+
+/* --- STORY FORM --- */
+.story-form {
+  position: absolute;
+  top: 120px;
+  left: 20px;
+  background: var(--color-surface);
+  padding: 20px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  width: 300px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 100;
+  border: 1px solid var(--color-border);
+  animation: slideUp 0.3s ease;
+}
+
+.story-form__header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.story-form__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.story-form__close {
+  background: none;
+  border: none;
+  color: var(--color-text-dim);
+  cursor: pointer;
+  padding: 0;
+}
+
+.story-form__section { margin-bottom: 12px; }
+
+.story-form__label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 5px;
+}
+
+.story-form__categories {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.story-form__cat-btn {
+  padding: 8px;
+  background: var(--color-border);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.story-form__cat-btn--active {
+  background: var(--cat-color, var(--color-accent));
+}
+
+.story-form__textarea {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-light);
+  color: white;
+  border-radius: var(--radius-sm);
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.story-form__textarea:focus {
+  border-color: var(--color-accent);
+}
+
+.story-form__char-count {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--color-text-faint);
+  margin-top: 4px;
+}
+
+.story-form__char-count--over { color: #ef4444; }
+
+.story-form__submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  transition: background 0.2s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.story-form__submit:hover:not(:disabled) {
+  background: #e6004c;
+}
+
+.story-form__submit:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.story-form__submit:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+/* --- APP HEADER --- */
 .app-title-container {
   position: absolute;
   top: 20px;
@@ -209,28 +469,52 @@ html, body {
   font-weight: 900;
   letter-spacing: -1px;
   text-shadow: 0 4px 12px rgba(0,0,0,0.8);
-  font-size: 1.5rem; 
+  font-size: 1.5rem;
 }
 
-/* --- MEDIA QUERY (PANTALLAS GRANDES / PC) --- */
+.app-title-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+}
+
+.app-title-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--color-accent);
+  animation: pulse-dot 2s infinite;
+}
+
+.app-title-count {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* --- RESPONSIVE --- */
 @media (min-width: 768px) {
-  
-  /* PC: Modal más espacioso */
-  .modal-content {
-    padding: 32px;
-  }
-  .modal-title {
-    font-size: 1.8rem;
-  }
+  .modal-content { padding: 32px; }
+  .modal-title { font-size: 1.8rem; }
+  .filter-bar { top: 20px; bottom: auto; }
+  .app-title-text { font-size: 2rem; }
+}
 
-  /* PC: Filtros arriba */
-  .filter-bar {
-    top: 20px;
-    bottom: auto;
-  }
-
-  /* PC: Título gigante */
-  .app-title-text {
-    font-size: 2rem;
+/* Mobile form adjustment */
+@media (max-width: 480px) {
+  .story-form {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    top: auto;
+    bottom: 80px;
   }
 }

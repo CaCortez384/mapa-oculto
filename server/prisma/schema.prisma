@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,9 +18,23 @@ model Story {
   longitude Float
   location  Unsupported("geography(Point, 4326)")?
   createdAt DateTime @default(now())
-  
-  // --- NUEVO CAMPO ---
-  likes     Int      @default(0)  // Empieza en cero
-  
+  likes     Int      @default(0)
+
+  // Relación con reportes
+  reports   Report[]
+
   @@index([location], name: "location_idx", type: Gist)
+  @@index([category])
+  @@index([createdAt])
+}
+
+model Report {
+  id        Int      @id @default(autoincrement())
+  storyId   Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@index([storyId])
 }
