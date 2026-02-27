@@ -32,6 +32,11 @@ interface MapStore {
     // Welcome modal
     showWelcome: boolean;
     setShowWelcome: (show: boolean) => void;
+
+    // Trending drawer
+    showTrending: boolean;
+    setShowTrending: (show: boolean) => void;
+    toggleTrending: () => void;
 }
 
 const DEFAULT_FORM: StoryFormData = { content: '', category: 'Miedo' as Category };
@@ -61,4 +66,9 @@ export const useMapStore = create<MapStore>((set) => ({
     // Welcome modal
     showWelcome: false,
     setShowWelcome: (showWelcome) => set({ showWelcome }),
+
+    // Trending drawer
+    showTrending: false,
+    setShowTrending: (showTrending) => set({ showTrending }),
+    toggleTrending: () => set((state) => ({ showTrending: !state.showTrending })),
 }));

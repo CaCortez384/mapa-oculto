@@ -2,9 +2,18 @@ import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'sonner';
 import { getApiBaseUrl } from '../services/api';
-import type { Story } from '../types/story';
+import type { Story, ReactionCounts } from '../types/story';
 
-export function useSocket(addStory: (story: Story) => void) {
+interface ReactionEvent {
+    storyId: number;
+    reactions: ReactionCounts;
+    totalReactions: number;
+}
+
+export function useSocket(
+    addStory: (story: Story) => void,
+    updateStoryReactions: (storyId: number, reactions: ReactionCounts, totalReactions: number) => void
+) {
     useEffect(() => {
         const apiUrl = getApiBaseUrl();
         const socket = io(apiUrl.replace('/api', ''));
@@ -14,6 +23,10 @@ export function useSocket(addStory: (story: Story) => void) {
             toast.success('¡Alguien acaba de publicar una historia nueva!', {
                 icon: '📡',
             });
+        });
+
+        socket.on('story-reaction', (data: ReactionEvent) => {
+            updateStoryReactions(data.storyId, data.reactions, data.totalReactions);
         });
 
         return () => {

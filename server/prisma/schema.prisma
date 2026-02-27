@@ -22,10 +22,24 @@ model Story {
 
   // Relación con reportes
   reports   Report[]
+  reactions Reaction[]
 
   @@index([location], name: "location_idx", type: Gist)
   @@index([category])
   @@index([createdAt])
+}
+
+model Reaction {
+  id        Int      @id @default(autoincrement())
+  storyId   Int
+  type      String   // shock | sad | fire | laugh | love
+  sessionId String
+  createdAt DateTime @default(now())
+
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, type, sessionId])
+  @@index([storyId])
 }
 
 model Report {

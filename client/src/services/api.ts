@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Story, StoryFormData, NewStoryLocation } from '../types/story';
+import type { Story, StoryFormData, NewStoryLocation, ReactionType, ReactionCounts } from '../types/story';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -35,13 +35,37 @@ export const getStoryById = async (id: string | number): Promise<Story> => {
     return response.data;
 };
 
-export const likeStory = async (storyId: number): Promise<Story> => {
-    const response = await api.patch<Story>(`/stories/${storyId}/like`);
+interface ReactionResponse {
+    storyId: number;
+    reactions: ReactionCounts;
+    totalReactions: number;
+}
+
+export const reactToStory = async (
+    storyId: number,
+    type: ReactionType,
+    sessionId: string
+): Promise<ReactionResponse> => {
+    const response = await api.post<ReactionResponse>(`/stories/${storyId}/react`, {
+        type,
+        sessionId,
+    });
     return response.data;
 };
 
-export const unlikeStory = async (storyId: number): Promise<Story> => {
-    const response = await api.patch<Story>(`/stories/${storyId}/unlike`);
+export const removeReaction = async (
+    storyId: number,
+    type: ReactionType,
+    sessionId: string
+): Promise<ReactionResponse> => {
+    const response = await api.delete<ReactionResponse>(`/stories/${storyId}/react`, {
+        data: { type, sessionId },
+    });
+    return response.data;
+};
+
+export const fetchTrending = async (): Promise<Story[]> => {
+    const response = await api.get<Story[]>('/stories/trending');
     return response.data;
 };
 

@@ -15,6 +15,7 @@ import { StoryMarker } from './components/StoryMarker';
 import { StoryPopup } from './components/StoryPopup';
 import { StoryForm } from './components/StoryForm';
 import { AppHeader } from './components/AppHeader';
+import { TrendingDrawer } from './components/TrendingDrawer';
 import { WelcomeModal } from './WelcomeModal';
 
 // Hooks
@@ -50,16 +51,17 @@ function App() {
   // --- Hooks ---
   const {
     stories,
-    likedStories,
+    userReactions,
     isSubmitting,
     fetchStories,
     addStory,
     handleSubmit,
-    handleLike,
+    handleReaction,
+    updateStoryReactions,
   } = useStories();
 
   useGeolocation();
-  useSocket(addStory);
+  useSocket(addStory, updateStoryReactions);
   useDeepLink();
 
   // --- Effects ---
@@ -159,9 +161,9 @@ function App() {
         {selectedCluster.length > 0 && (
           <StoryPopup
             stories={selectedCluster}
-            likedStories={likedStories}
+            userReactions={userReactions}
             onClose={() => setSelectedCluster([])}
-            onLike={handleLike}
+            onReact={handleReaction}
           />
         )}
 
@@ -193,6 +195,7 @@ function App() {
       )}
 
       <AppHeader storyCount={stories.length} />
+      <TrendingDrawer />
     </div>
   );
 }

@@ -19,5 +19,14 @@ export const reportStorySchema = z.object({
         .max(300, "El motivo no puede superar 300 caracteres"),
 });
 
+export const reactStorySchema = z.object({
+    type: z.enum(["shock", "sad", "fire", "laugh", "love"], {
+        error: "Tipo de reacción inválido",
+    }),
+    sessionId: z.string().min(1, "sessionId es requerido"),
+});
+
 export type CreateStoryInput = z.infer<typeof createStorySchema>;
 export type ReportStoryInput = z.infer<typeof reportStorySchema>;
+export type ReactStoryInput = z.infer<typeof reactStorySchema>;
+
